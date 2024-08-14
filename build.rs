@@ -323,11 +323,21 @@ fn make_elfutils(compiler: &cc::Tool, src_dir: &path::Path, out_dir: &path::Path
     assert!(status.success(), "make failed");
 
     let status = process::Command::new("make")
+        .arg("-j")
+        .arg(&format!("{}", num_cpus()))
+        .arg("BUILD_STATIC_ONLY=y")
+        .current_dir(&src_dir.join("elfutils/lib"))
+        .status()
+        .expect("could not execute make");
+
+    assert!(status.success(), "make failed");
+
+    let status = process::Command::new("make")
         .arg("install")
         .arg("-j")
         .arg(&format!("{}", num_cpus()))
         .arg("BUILD_STATIC_ONLY=y")
-        .current_dir(&src_dir.join("elfutils"))
+        .current_dir(&src_dir.join("elfutils/libelf"))
         .status()
         .expect("could not execute make");
 
