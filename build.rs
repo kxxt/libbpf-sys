@@ -287,8 +287,9 @@ fn make_elfutils(compiler: &cc::Tool, src_dir: &path::Path, out_dir: &path::Path
 
     assert!(status.success(), "make failed");
 
-    // location of libz.a
-    let out_lib = format!("-L{}", out_dir.display());
+    // Specify location of libz.a
+    // And link to libstdc++
+    let ldflags = format!("-L{} -lstdc++", out_dir.display());
     let status = process::Command::new("./configure")
         .arg("--disable-debuginfod")
         .arg("--disable-libdebuginfod")
@@ -314,7 +315,7 @@ fn make_elfutils(compiler: &cc::Tool, src_dir: &path::Path, out_dir: &path::Path
         .env("CXX", compiler.path())
         .env("CFLAGS", &cflags)
         .env("CXXFLAGS", &cflags)
-        .env("LDFLAGS", &out_lib)
+        .env("LDFLAGS", &ldflags)
         .current_dir(&src_dir.join("elfutils"))
         .status()
         .expect("could not execute make");
