@@ -44,6 +44,7 @@ $ cargo build
 #### Environment Variables
 
 - `LIBBPF_SYS_EXTRA_CFLAGS` can be used to pass extra cflags when vendoring libbpf, libz or libelf.
+- `LIBBPF_SYS_LIBRARY_PATH`: colon separated pathes for the linker to find native libs.
 
 ### Distribution
 
