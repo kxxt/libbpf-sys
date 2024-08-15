@@ -288,8 +288,7 @@ fn make_elfutils(compiler: &cc::Tool, src_dir: &path::Path, out_dir: &path::Path
     assert!(status.success(), "make failed");
 
     // Specify location of libz.a
-    // And link to libstdc++
-    let ldflags = format!("-L{} -lstdc++", out_dir.display());
+    let ldflags = format!("-L{}", out_dir.display());
     let status = process::Command::new("./configure")
         .arg("--disable-debuginfod")
         .arg("--disable-libdebuginfod")
