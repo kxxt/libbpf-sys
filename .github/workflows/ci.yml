@@ -80,7 +80,7 @@ jobs:
 
       - name: Install linker for ${{ matrix.os-target }}
         if: matrix.os-arch != 'amd64'
-        run: sudo apt-get install gcc-${{ matrix.os-target }}
+        run: sudo apt-get install g{cc,++}-${{ matrix.os-target }}
 
       - name: Install Rust stable for ${{ matrix.rust-target }}
         uses: dtolnay/rust-toolchain@stable
