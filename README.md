@@ -1,7 +1,3 @@
-# libbpf-sys-cross: A cross-compilation friendly fork of libbpf-sys
-
-This crate is probably temporary. In the end I want to upstream all changes back to libbpf-sys.
-
 # libbpf-sys [![Build status](https://github.com/libbpf/libbpf-sys/workflows/CI/badge.svg)](https://github.com/libbpf/libbpf-sys/actions?query=workflow%3A%22CI%22) [![crates.io version number badge](https://img.shields.io/crates/v/libbpf-sys.svg)](https://crates.io/crates/libbpf-sys)
 
 **Rust bindings to _libbpf_ from the Linux kernel**
