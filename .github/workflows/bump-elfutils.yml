@@ -1,0 +1,77 @@
+name: Bump elfutils and open PR
+run-name: Generating missing headers for elfutils and open PR
+# Needed repo secrets:
+# PUSH_TOKEN: A github token for push permission on elfutils repo
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: A tag in elfutils mirror repo
+        required: true
+        type: string
+jobs:
+  generate-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'kxxt/elfutils-cross'
+          ref: ${{ inputs.tag }}
+          token:  ${{ secrets.PUSH_TOKEN }}
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install \
+              build-essential \
+              libelf-dev \
+              zlib1g-dev \
+              autopoint \
+              gettext
+      - name: Configure
+        run: |
+          autoreconf --install --force
+          ./configure --disable-debuginfod --enable-maintainer-mode \
+            --without-zstd --disable-libdebuginfod
+      - name: Build
+        run: |
+          make -C lib libeu.a
+          make dist
+      - name: Setup git
+        run: |
+          # https://github.com/orgs/community/discussions/26560
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Push
+        run: |
+          set -x
+          # Detach HEAD
+          git checkout --detach
+          # Commit generated headers
+          git add -f libdw/known-dwarf.h libcpu/x86_64_dis.h libcpu/i386_dis.h
+          git commit -m "generate headers"
+          # Create branch
+          git switch -c ${{ inputs.tag }}-cross
+          # Publish branch
+          git push -u origin ${{ inputs.tag }}-cross
+      - name: Checkout libbpf-sys
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Push to new branch
+        run: |
+          set -x
+          # Switch to a new branch
+          git switch -c bump-elfutils/${{ inputs.tag }}-cross
+          # Update submodule
+          git -C elfutils fetch -v origin ${{ inputs.tag }}-cross
+          git -C elfutils switch --detach FETCH_HEAD
+          # Commit and push
+          git add elfutils
+          git commit -m "build(deps): update elfutils to ${{ inputs.tag }}-cross"
+          git push -u origin bump-elfutils/${{ inputs.tag }}-cross
+      - name: Create PR
+        run: gh -R ${{ github.repository }} pr create -H bump-elfutils/${{ inputs.tag }}-cross -B master --fill-first
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
