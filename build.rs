@@ -292,6 +292,7 @@ fn make_elfutils(compiler: &cc::Tool, src_dir: &path::Path, out_dir: &path::Path
     let status = process::Command::new("./configure")
         .arg("--disable-debuginfod")
         .arg("--disable-libdebuginfod")
+        .arg("--disable-demangler")
         .arg("--without-zstd")
         .arg("--prefix")
         .arg(&src_dir.join("elfutils/prefix_dir"))
